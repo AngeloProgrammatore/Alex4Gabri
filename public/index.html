@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Alex4Gabri â English Conversation Coach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: #141420;
+      --bg-card-hover: #1a1a2e;
+      --bg-input: #1e1e30;
+      --accent: #6c63ff;
+      --accent-glow: rgba(108, 99, 255, 0.3);
+      --accent-light: #8b83ff;
+      --green: #00d4aa;
+      --green-glow: rgba(0, 212, 170, 0.2);
+      --orange: #ff8c42;
+      --red: #ff4757;
+      --red-glow: rgba(255, 71, 87, 0.25);
+      --text-primary: #e8e6f0;
+      --text-secondary: #9590b0;
+      --text-muted: #6b6690;
+      --border: #2a2a40;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    #app { height: 100%; display: flex; flex-direction: column; }
+
+    /* HEADER */
+    .header {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), #9c88ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      background: linear-gradient(135deg, var(--accent-light), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .topic-badge {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* CHAT AREA */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .chat-area::-webkit-scrollbar { width: 4px; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* WELCOME SCREEN */
+    .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      gap: 24px;
+    }
+
+    .welcome-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--accent), #9c88ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      box-shadow: 0 8px 40px var(--accent-glow);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .welcome h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .welcome p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .topic-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .topic-btn:hover, .topic-btn:active {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .topic-btn .emoji { font-size: 20px; }
+
+    /* MESSAGE BUBBLES */
+    .msg {
+      max-width: 90%;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-user {
+      align-self: flex-end;
+    }
+
+    .msg-user .bubble {
+      background: linear-gradient(135deg, var(--accent), #5a52d5);
+      border-radius: var(--radius) var(--radius) 4px var(--radius);
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: white;
+    }
+
+    .msg-ai {
+      align-self: flex-start;
+    }
+
+    .msg-ai .bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ai-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-label .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    /* CORRECTION CARD */
+    .correction-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .correction-header {
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .correction-section {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .correction-section.error {
+      background: rgba(255, 71, 87, 0.06);
+    }
+
+    .correction-section.correct {
+      background: rgba(0, 212, 170, 0.06);
+    }
+
+    .correction-section.translation {
+      background: rgba(108, 99, 255, 0.06);
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+
+    .section-label.error { color: var(--red); }
+    .section-label.correct { color: var(--green); }
+    .section-label.translation { color: var(--accent-light); }
+
+    .section-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    /* REPLY BUBBLE */
+    .reply-bubble {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius) var(--radius) var(--radius) 4px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+
+    .follow-up {
+      font-weight: 500;
+      color: var(--accent-light);
+      margin-top: 6px;
+      display: block;
+    }
+
+    .encouragement-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--green-glow);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      width: fit-content;
+    }
+
+    /* LISTEN BUTTON ON MESSAGES */
+    .listen-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+      margin-top: 6px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .listen-btn:hover { border-color: var(--accent); color: var(--accent-light); }
+    .listen-btn.playing { border-color: var(--green); color: var(--green); }
+
+    /* TYPING INDICATOR */
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 16px;
+      align-self: flex-start;
+    }
+
+    .typing span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* INPUT AREA */
+    .input-area {
+      padding: 12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--border);
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      flex-shrink: 0;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .text-input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 10px 16px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      resize: none;
+      max-height: 100px;
+      min-height: 42px;
+      line-height: 1.4;
+      transition: border-color 0.2s;
+    }
+
+    .text-input:focus { border-color: var(--accent); }
+    .text-input::placeholder { color: var(--text-muted); }
+
+    .mic-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #5a52d5);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .mic-btn:hover { transform: scale(1.05); }
+    .mic-btn:active { transform: scale(0.95); }
+
+    .mic-btn.recording {
+      background: linear-gradient(135deg, var(--red), #e03e4e);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--red-glow); }
+      50% { box-shadow: 0 0 0 14px transparent; }
+    }
+
+    .mic-btn svg { width: 22px; height: 22px; }
+
+    .send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: var(--green);
+      color: var(--bg-primary);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover { transform: scale(1.05); }
+    .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .send-btn svg { width: 20px; height: 20px; }
+
+    /* RECORDING INDICATOR */
+    .recording-indicator {
+      text-align: center;
+      padding: 6px;
+      font-size: 12px;
+      color: var(--red);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .rec-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* SPEECH NOT SUPPORTED */
+    .no-speech-warning {
+      background: rgba(255, 140, 66, 0.1);
+      border: 1px solid rgba(255, 140, 66, 0.3);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--orange);
+      text-align: center;
+      margin: 8px 16px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect, useCallback } = React;
+
+    // ---- ICONS ----
+    const MicIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>
+      </svg>
+    );
+
+    const StopIcon = () => (
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+    );
+
+    const SendIcon = () => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    );
+
+    const VolumeIcon = () => (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+    );
+
+    // ---- API HELPERS ----
+    const API_BASE = window.location.origin;
+
+    async function chatAPI(messages) {
+      const res = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages })
+      });
+      if (!res.ok) throw new Error('API error');
+      return res.json();
+    }
+
+    async function ttsAPI(text) {
+      const res = await fetch(`${API_BASE}/api/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, voice: 'nova' })
+      });
+      if (!res.ok) throw new Error('TTS error');
+      return res.blob();
+    }
+
+    // ---- SPEECH RECOGNITION ----
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasSpeech = !!SpeechRecognition;
+
+    // ---- TOPICS ----
+    const TOPICS = [
+      { emoji: "âï¸", label: "Travel", prompt: "I want to practice talking about travel and vacation plans" },
+      { emoji: "ð", label: "Food & Cooking", prompt: "I want to practice talking about food, recipes and cooking" },
+      { emoji: "ð¬", label: "Movies & TV", prompt: "I want to practice talking about movies and TV shows" },
+      { emoji: "ð¼", label: "Work & Career", prompt: "I want to practice talking about work and career" },
+      { emoji: "â½", label: "Sport", prompt: "I want to practice talking about sports and fitness" },
+      { emoji: "ðµ", label: "Music", prompt: "I want to practice talking about music and concerts" },
+      { emoji: "ð", label: "News & World", prompt: "I want to discuss current events and world news" },
+      { emoji: "ð¤", label: "Technology", prompt: "I want to practice talking about technology and AI" },
+    ];
+
+    // ---- MAIN APP ----
+    function App() {
+      const [messages, setMessages] = useState([]); // chat history for API
+      const [chatBubbles, setChatBubbles] = useState([]); // UI bubbles
+      const [isLoading, setIsLoading] = useState(false);
+      const [isRecording, setIsRecording] = useState(false);
+      const [inputText, setInputText] = useState('');
+      const [currentTopic, setCurrentTopic] = useState('');
+      const [started, setStarted] = useState(false);
+      const [playingId, setPlayingId] = useState(null);
+      const chatRef = useRef(null);
+      const recognitionRef = useRef(null);
+      const audioRef = useRef(null);
+      const inputRef = useRef(null);
+
+      // Auto-scroll
+      useEffect(() => {
+        if (chatRef.current) {
+          setTimeout(() => {
+            chatRef.current.scrollTop = chatRef.current.scrollHeight;
+          }, 100);
+        }
+      }, [chatBubbles, isLoading]);
+
+      // Send message to API
+      const sendMessage = useCallback(async (text) => {
+        if (!text.trim() || isLoading) return;
+
+        const userMsg = { role: 'user', content: text };
+        const newMessages = [...messages, userMsg];
+        setMessages(newMessages);
+        setChatBubbles(prev => [...prev, { type: 'user', text }]);
+        setInputText('');
+        setIsLoading(true);
+
+        try {
+          const data = await chatAPI(newMessages);
+          const r = data.response;
+          const aiMsg = { role: 'assistant', content: JSON.stringify(r) };
+          setMessages(prev => [...prev, aiMsg]);
+
+          setChatBubbles(prev => [...prev, {
+            type: 'ai',
+            correction: r.correction,
+            correct_english: r.correct_english,
+            italian_translation: r.italian_translation,
+            reply: r.reply,
+            follow_up: r.follow_up_question,
+            encouragement: r.encouragement,
+            topic_hint: r.topic_hint
+          }]);
+
+          if (r.topic_hint) setCurrentTopic(r.topic_hint);
+        } catch (e) {
+          console.error(e);
+          setChatBubbles(prev => [...prev, {
+            type: 'ai',
+            reply: "Oops! Something went wrong. Could you try again? ð",
+            follow_up: '',
+            correction: '',
+            correct_english: '',
+            italian_translation: '',
+            encouragement: 'Try again!',
+            topic_hint: ''
+          }]);
+        } finally {
+          setIsLoading(false);
+        }
+      }, [messages, isLoading]);
+
+      // Start topic
+      const startTopic = (topic) => {
+        setStarted(true);
+        sendMessage(topic.prompt);
+      };
+
+      // Toggle recording
+      const toggleRecording = () => {
+        if (isRecording) {
+          if (recognitionRef.current) recognitionRef.current.stop();
+          setIsRecording(false);
+          return;
+        }
+
+        if (!hasSpeech) return;
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        recognition.continuous = false;
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          setInputText(transcript);
+          setIsRecording(false);
+          // Auto-send after speech recognition
+          setTimeout(() => sendMessage(transcript), 200);
+        };
+
+        recognition.onerror = (event) => {
+          console.error('Speech error:', event.error);
+          setIsRecording(false);
+        };
+
+        recognition.onend = () => {
+          setIsRecording(false);
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
+        setIsRecording(true);
+      };
+
+      // Play TTS
+      const playTTS = async (text, id) => {
+        if (playingId === id) {
+          if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+          setPlayingId(null);
+          return;
+        }
+
+        try {
+          setPlayingId(id);
+          const blob = await ttsAPI(text);
+          const url = URL.createObjectURL(blob);
+          const audio = new Audio(url);
+          audioRef.current = audio;
+          audio.onended = () => { setPlayingId(null); URL.revokeObjectURL(url); };
+          audio.play();
+        } catch (e) {
+          console.error('TTS failed:', e);
+          setPlayingId(null);
+          // Fallback to browser TTS
+          if ('speechSynthesis' in window) {
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.rate = 0.9;
+            utter.onend = () => setPlayingId(null);
+            speechSynthesis.speak(utter);
+          }
+        }
+      };
+
+      // Handle key press
+      const handleKeyDown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage(inputText);
+        }
+      };
+
+      // ---- RENDER ----
+      if (!started) {
+        return (
+          <div id="app">
+            <div className="header">
+              <div className="logo">
+                <div className="logo-icon">ð£ï¸</div>
+                <span className="logo-text">Alex4Gabri</span>
+              </div>
+            </div>
+            <div className="chat-area">
+              <div className="welcome">
+                <div className="welcome-icon">ð£ï¸</div>
+                <h1>Hey Gabri!<br/>Let's talk!</h1>
+                <p>
+                  Scegli un argomento e inizia a parlare in inglese.
+                  Sbaglia pure â ti correggo io come un amico madrelingua
+                  paziente e ti aiuto a migliorare!
+                </p>
+                <div className="topic-grid">
+                  {TOPICS.map((t, i) => (
+                    <button key={i} className="topic-btn" onClick={() => startTopic(t)}>
+                      <span className="emoji">{t.emoji}</span>
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div id="app">
+          <div className="header">
+            <div className="logo">
+              <div className="logo-icon">ð£ï¸</div>
+              <span className="logo-text">Alex4Gabri</span>
+            </div>
+            {currentTopic && <span className="topic-badge">{currentTopic}</span>}
+          </div>
+
+          <div className="chat-area" ref={chatRef}>
+            {chatBubbles.map((msg, i) => {
+              if (msg.type === 'user') {
+                return (
+                  <div key={i} className="msg msg-user">
+                    <div className="bubble">{msg.text}</div>
+                  </div>
+                );
+              }
+
+              const hasCorrection = msg.correction && !msg.correction.toLowerCase().includes('perfect') && !msg.correction.toLowerCase().includes('no mistake');
+
+              return (
+                <div key={i} className="msg msg-ai">
+                  <div className="bubble-wrapper">
+                    <div className="ai-label"><span className="dot"></span> Alex4Gabri</div>
+
+                    {msg.encouragement && (
+                      <div className="encouragement-badge">â­ {msg.encouragement}</div>
+                    )}
+
+                    {hasCorrection && (
+                      <div className="correction-card">
+                        <div className="correction-header" style={{color: 'var(--red)'}}>
+                          ð Correction
+                        </div>
+                        <div className="correction-section error">
+                          <div className="section-label error">What to fix</div>
+                          <div className="section-text">{msg.correction}</div>
+                        </div>
+                        <div className="correction-section correct">
+                          <div className="section-label correct">â Correct English</div>
+                          <div className="section-text">{msg.correct_english}</div>
+                          <button
+                            className={`listen-btn ${playingId === `correct-${i}` ? 'playing' : ''}`}
+                            onClick={() => playTTS(msg.correct_english, `correct-${i}`)}
+                          >
+                            <VolumeIcon /> {playingId === `correct-${i}` ? 'Playing...' : 'Listen'}
+                          </button>
+                        </div>
+                        <div className="correction-section translation">
+                          <div className="section-label translation">ð®ð¹ Italiano</div>
+                          <div className="section-text">{msg.italian_translation}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!hasCorrection && msg.correct_english && (
+                      <div className="correction-card">
+                        <div className="correction-header" style={{color: 'var(--green)'}}>
+                          â Perfect!
+                        </div>
+                        {msg.italian_translation && (
+                          <div className="correction-section translation">
+                            <div className="section-label translation">ð®ð¹ Italiano</div>
+                            <div className="section-text">{msg.italian_translation}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="reply-bubble">
+                      {msg.reply}
+                      {msg.follow_up && <span className="follow-up">{msg.follow_up}</span>}
+                      <br/>
+                      <button
+                        className={`listen-btn ${playingId === `reply-${i}` ? 'playing' : ''}`}
+                        onClick={() => playTTS(`${msg.reply} ${msg.follow_up || ''}`, `reply-${i}`)}
+                      >
+                        <VolumeIcon /> {playingId === `reply-${i}` ? 'Playing...' : 'Listen'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {isLoading && (
+              <div className="typing">
+                <span></span><span></span><span></span>
+              </div>
+            )}
+          </div>
+
+          {!hasSpeech && (
+            <div className="no-speech-warning">
+              â ï¸ Il tuo browser non supporta il riconoscimento vocale. Usa Chrome per la voce, o scrivi!
+            </div>
+          )}
+
+          {isRecording && (
+            <div className="recording-indicator">
+              <span className="rec-dot"></span> Listening... speak in English
+            </div>
+          )}
+
+          <div className="input-area">
+            <div className="input-row">
+              <textarea
+                ref={inputRef}
+                className="text-input"
+                placeholder="Type or tap the mic..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                rows="1"
+              />
+              {hasSpeech && (
+                <button
+                  className={`mic-btn ${isRecording ? 'recording' : ''}`}
+                  onClick={toggleRecording}
+                  title={isRecording ? 'Stop recording' : 'Start recording'}
+                >
+                  {isRecording ? <StopIcon /> : <MicIcon />}
+                </button>
+              )}
+              <button
+                className="send-btn"
+                onClick={() => sendMessage(inputText)}
+                disabled={!inputText.trim() || isLoading}
+                title="Send message"
+              >
+                <SendIcon />
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('app')).render(<App />);
+  </script>
+</body>
+</html>
